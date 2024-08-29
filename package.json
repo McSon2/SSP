@@ -1,0 +1,92 @@
+{
+  "name": "ssp",
+  "private": true,
+  "version": "0.1.6",
+  "type": "module",
+  "main": "public/main.cjs",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build && electron-builder",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "electron": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
+    "electron:dev": "concurrently \"vite\" \"electron .\"",
+    "electron:build": "npm run build",
+    "publish": "electron-builder --publish always"
+  },
+  "author": {
+    "name": "McSon",
+    "email": "maximesaltet@gmail.com"
+  },
+  "description": "Description de votre application SSP",
+  "build": {
+    "appId": "com.mcson.ssp",
+    "productName": "SSP",
+    "files": [
+      "dist/**/*",
+      "public/**/*",
+      "src/**/*.mjs",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "build",
+      "output": "release"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "McSon2",
+        "repo": "SSP"
+      }
+    ]
+  },
+  "dependencies": {
+    "@web3icons/core": "^3.6.1",
+    "@web3icons/react": "^3.6.1",
+    "axios": "^1.7.3",
+    "body-parser": "^1.20.2",
+    "chart.js": "^4.4.3",
+    "electron-updater": "^6.2.1",
+    "express": "^4.19.2",
+    "framer-motion": "^11.3.28",
+    "get-port": "^5.1.1",
+    "localtunnel": "^2.0.2",
+    "mongodb": "^6.8.0",
+    "qrcode.react": "^3.1.0",
+    "react": "^18.3.1",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "^18.3.1",
+    "react-icons": "^5.3.0",
+    "react-router-dom": "^6.26.0",
+    "react-virtualized-auto-sizer": "^1.0.24",
+    "react-window": "^1.8.10",
+    "tailwind-scrollbar": "^3.1.0",
+    "uuid": "^10.0.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@types/react-router-dom": "^5.3.3",
+    "@types/react-window": "^1.8.8",
+    "@typescript-eslint/eslint-plugin": "^7.15.0",
+    "@typescript-eslint/parser": "^7.15.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.13",
+    "concurrently": "^6.2.1",
+    "electron": "^31.3.1",
+    "electron-builder": "^24.13.3",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.7",
+    "postcss": "^8.4.23",
+    "tailwindcss": "^3.3.1",
+    "typescript": "^5.2.2",
+    "vite": "^5.3.4",
+    "wait-on": "^6.0.0"
+  }
+}

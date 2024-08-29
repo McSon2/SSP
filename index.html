@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StakeSlotBot</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      console.log("HTML chargé");
+      window.addEventListener("error", function (event) {
+        console.error("Uncaught error:", event.error);
+      });
+      window.addEventListener("unhandledrejection", function (event) {
+        console.error("Unhandled promise rejection:", event.reason);
+      });
+      window.addEventListener("DOMContentLoaded", () => {
+        console.log("DOM chargé");
+      });
+      window.addEventListener("load", () => {
+        console.log("Toutes les ressources chargées");
+        console.log(
+          "Contenu de #root:",
+          document.getElementById("root").innerHTML
+        );
+      });
+    </script>
+  </body>
+</html>
