@@ -5,4 +5,16 @@ dist/
 src/
 release/
 build/
-
+public/
+*.txt
+*.json
+*.lock
+*.md
+*.yml
+*.yaml
+*.toml
+*.ini
+*.cfg
+*.conf
+*.json
+*.ts
