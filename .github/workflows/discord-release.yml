@@ -9,42 +9,28 @@ jobs:
   notify_discord:
     runs-on: ubuntu-latest
     steps:
-      - name: Send Discord Notification
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Discord Webhook Notification
+        uses: Ilshidur/action-discord@master
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        with:
+          args: |
+            A new release has been published!
+            **Name:** ${{ github.event.release.name }}
+            **URL:** ${{ github.event.release.html_url }}
+
+            **Description:**
+            ${{ github.event.release.body }}
+
+      - name: Debug Information
+        if: failure()
         run: |
-          TITLE=$(echo "${{ github.event.release.name }}" | sed 's/"/\\"/g')
-          DESCRIPTION=$(echo "${{ github.event.release.body }}" | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
-          URL="${{ github.event.release.html_url }}"
-
-          JSON_PAYLOAD=$(cat <<EOF
-          {
-            "embeds": [{
-              "title": "${TITLE}",
-              "description": "${DESCRIPTION}",
-              "url": "${URL}",
-              "color": 3066993
-            }]
-          }
-          EOF
-          )
-
-          # Validate JSON
-          echo $JSON_PAYLOAD | jq . > /dev/null 2>&1
-          if [ $? -ne 0 ]; then
-            echo "Invalid JSON payload. Exiting."
-            exit 1
-          fi
-
-          # Send notification
-          RESPONSE=$(curl -s -w "\n%{http_code}" -H "Content-Type: application/json" -X POST -d "${JSON_PAYLOAD}" $DISCORD_WEBHOOK)
-          HTTP_STATUS=$(echo "$RESPONSE" | tail -n 1)
-          BODY=$(echo "$RESPONSE" | sed '$d')
-
-          if [ $HTTP_STATUS -ne 204 ]; then
-            echo "Error sending Discord notification. Status code: $HTTP_STATUS"
-            echo "Response body: $BODY"
-            exit 1
-          else
-            echo "Discord notification sent successfully."
-          fi
+          echo "Workflow failed. Debug information:"
+          echo "Event name: ${{ github.event_name }}"
+          echo "Release name: ${{ github.event.release.name }}"
+          echo "Release URL: ${{ github.event.release.html_url }}"
+          echo "First 500 characters of release body:"
+          echo "${{ github.event.release.body }}" | cut -c 1-500
