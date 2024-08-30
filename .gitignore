@@ -6,11 +6,14 @@ src/
 release/
 build/
 public/
+*.cjs
 *.txt
 *.json
 *.lock
 *.md
-*.toml
+*.tom
+*.html
+*.js
 *.ini
 *.cfg
 *.conf
