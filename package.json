@@ -1,7 +1,7 @@
 {
   "name": "ssp",
   "private": true,
-  "version": "0.1.6",
+  "version": "0.2.1",
   "type": "module",
   "main": "public/main.cjs",
   "scripts": {
@@ -12,7 +12,7 @@
     "electron": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
     "electron:dev": "concurrently \"vite\" \"electron .\"",
     "electron:build": "npm run build",
-    "publish": "electron-builder --publish always"
+    "publish": "cross-env GH_TOKEN=$env:GH_TOKEN tsc && vite build && electron-builder --publish always"
   },
   "author": {
     "name": "McSon",
@@ -32,10 +32,19 @@
       "buildResources": "build",
       "output": "release"
     },
+    "nsis": {
+      "differentialPackage": true,
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
     "win": {
-      "target": "nsis",
+      "target": [
+        "nsis"
+      ],
+      "artifactName": "${productName}-${version}.${ext}",
       "icon": "build/icon.ico"
     },
+    "generateUpdatesFilesForAllChannels": true,
     "publish": [
       {
         "provider": "github",

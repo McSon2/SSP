@@ -10,7 +10,6 @@ public/
 *.json
 *.lock
 *.md
-*.yml
 *.yaml
 *.toml
 *.ini
@@ -18,3 +17,4 @@ public/
 *.conf
 *.json
 *.ts
+package.json

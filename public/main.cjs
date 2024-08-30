@@ -1,3 +1,5 @@
+//main.cjs
+
 const { app, BrowserWindow, ipcMain, session } = require("electron");
 const path = require("path");
 const fs = require("fs");
@@ -24,18 +26,12 @@ const PLISIO_API_KEY =
 async function initializeModules() {
   try {
     try {
-      console.log("Attempting to import DatabaseManager...");
       const databaseManagerModule = await import(
         "../src/js/DatabaseManager.mjs"
       );
-      console.log("DatabaseManager imported successfully");
 
       databaseManager = databaseManagerModule.default;
-      console.log("DatabaseManager instance created");
-
-      console.log("Attempting to connect to database...");
       await databaseManager.connect();
-      console.log("Successfully connected to database");
     } catch (error) {
       console.error("Error during database initialization:", error);
       console.error("Error stack:", error.stack);
@@ -57,8 +53,6 @@ async function initializeModules() {
 
     const serverModule = await import("./server.js");
     startServer = serverModule.startServer;
-
-    //console.log("Modules initialized successfully");
   } catch (error) {
     console.error("Error initializing modules:", error);
   }
@@ -73,18 +67,6 @@ let reloadSlotsInstance;
 let server;
 let tunnel;
 
-function checkForUpdates() {
-  autoUpdater.checkForUpdatesAndNotify();
-
-  autoUpdater.on("update-available", () => {
-    mainWindow.webContents.send("update-available");
-  });
-
-  autoUpdater.on("update-downloaded", () => {
-    mainWindow.webContents.send("update-downloaded");
-  });
-}
-
 async function startServerAndTunnel() {
   if (typeof startServer === "function") {
     try {
@@ -92,16 +74,12 @@ async function startServerAndTunnel() {
         handleServerCallback
       );
       server = newServer;
-      console.log(`Server started successfully on port ${port}`);
 
       // Create a tunnel
       tunnel = await localtunnel({ port });
       tunnelUrl = tunnel.url;
-      console.log("Tunnel URL:", tunnelUrl);
 
-      tunnel.on("close", () => {
-        console.log("Tunnel closed");
-      });
+      tunnel.on("close", () => {});
     } catch (serverError) {
       console.error("Error starting server:", serverError);
       throw serverError;
@@ -133,7 +111,6 @@ async function stopServerAndTunnel() {
       server = null;
     }
     tunnelUrl = null;
-    console.log("Server and tunnel stopped successfully");
   } catch (error) {
     console.error("Error in stopServerAndTunnel:", error);
     throw error; // Re-throw the error to be caught by the IPC handler
@@ -175,8 +152,23 @@ async function createWindow() {
     mainWindow.webContents.openDevTools();
   }
 
+  function checkForUpdates() {
+    autoUpdater.checkForUpdatesAndNotify();
+  }
+
   mainWindow.webContents.on("did-finish-load", () => {
     checkForUpdates();
+  });
+
+  autoUpdater.on("checking-for-update", () => {});
+  autoUpdater.on("update-available", (info) => {
+    mainWindow.webContents.send("update_available");
+  });
+  autoUpdater.on("update-not-available", (info) => {});
+  autoUpdater.on("error", (err) => {});
+  autoUpdater.on("download-progress", (progressObj) => {});
+  autoUpdater.on("update-downloaded", (info) => {
+    mainWindow.webContents.send("update_downloaded");
   });
 
   ["log", "error", "warn", "info"].forEach((method) => {
@@ -193,23 +185,8 @@ async function createWindow() {
   });
 }
 
-autoUpdater.on("update-available", () => {
-  mainWindow.webContents.send("update_available");
-});
-
-autoUpdater.on("update-downloaded", () => {
-  mainWindow.webContents.send("update_downloaded");
-});
-
-ipcMain.on("restart_app", () => {
-  autoUpdater.quitAndInstall();
-});
-
 function sendPaymentCompletedToRenderer(orderNumber) {
   if (mainWindow && !mainWindow.isDestroyed()) {
-    console.log(
-      `Main process: Sending payment-completed event to renderer for order: ${orderNumber}`
-    );
     mainWindow.webContents.send("payment-completed", orderNumber);
   } else {
     console.error(
@@ -460,7 +437,6 @@ ipcMain.handle("update-api-key", async (event, newApiKey) => {
   config.apiKey = newApiKey;
 
   fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
-  console.log("API key updated in config file");
 });
 
 //Function
@@ -714,28 +690,63 @@ ipcMain.handle("get-stake-username", (event) => {
   return stakeUsername;
 });
 
+const baseAmounts = {
+  "1_month": 19.99,
+  "3_months": 49.99,
+  "6_months": 79.99,
+  "12_months": 139.99,
+};
+
+let currentPrices = { ...baseAmounts };
+
+ipcMain.handle("apply-promo", async (event, promoCode, subscriptionType) => {
+  try {
+    const promoResult = await databaseManager.verifyPromoCode(
+      promoCode,
+      subscriptionType
+    );
+    if (promoResult.isValid) {
+      currentPrices = { ...baseAmounts };
+      currentPrices[subscriptionType] *= 1 - promoResult.discount;
+      return {
+        success: true,
+        updatedPrices: currentPrices,
+        appliedTo: subscriptionType,
+      };
+    } else {
+      return { success: false, message: promoResult.message };
+    }
+  } catch (error) {
+    console.error("Error verifying promo code:", error);
+    return {
+      success: false,
+      message: "An error occurred while verifying the promo code.",
+    };
+  }
+});
+
 async function createPlisioInvoice({
   stakeUsername,
   subscriptionType,
   currency,
+  promoCode,
 }) {
   // Start server and tunnel before creating invoice
   await startServerAndTunnel();
 
-  const amounts = {
-    "1_month": 19.99,
-    "2_months": 49.99,
-    "6_months": 79.99,
-    "12_months": 139.99,
-  };
+  let amount = currentPrices[subscriptionType];
 
-  const amount = amounts[subscriptionType];
-
-  console.log("tunnelUrl before request:", tunnelUrl);
+  if (promoCode) {
+    const promoResult = await databaseManager.verifyPromoCode(
+      promoCode,
+      subscriptionType
+    );
+    if (promoResult.isValid) {
+      amount *= 1 - promoResult.discount;
+    }
+  }
 
   const url = `${tunnelUrl}/plisio-callback?json=true`;
-
-  console.log("url", url);
 
   const orderNumber = `${stakeUsername}-${Date.now()}`;
 
@@ -758,14 +769,9 @@ async function createPlisioInvoice({
       }
     );
 
-    console.log("Plisio response:", JSON.stringify(response.data, null, 2));
-
     if (response.data.status === "success") {
       const invoiceData = response.data.data;
 
-      //console.log("Creating invoice in database:", invoiceData);
-
-      // Store the invoice information
       try {
         await databaseManager.createInvoice(
           invoiceData.txn_id,
@@ -776,19 +782,20 @@ async function createPlisioInvoice({
           currency,
           "pending"
         );
-        //console.log("Invoice created successfully in database");
       } catch (dbError) {
         console.error("Error creating invoice in database:", dbError);
         throw dbError;
       }
+
+      currentPrices = { ...baseAmounts };
 
       return invoiceData.invoice_url;
     } else {
       throw new Error("Failed to create Plisio invoice");
     }
   } catch (error) {
-    //console.error("Error creating Plisio invoice:", error);
-    //throw error;
+    console.error("Error creating Plisio invoice:", error);
+    throw error;
   }
 }
 
@@ -1062,7 +1069,6 @@ const providerModuleMap = {
 ipcMain.handle("load-provider-module", async (event, provider) => {
   try {
     const normalizedProvider = provider.toLowerCase().replace(/[' ]/g, "-");
-    //console.log("normalizedProvider", normalizedProvider); // Ajout de log
     const modulePath = providerModuleMap[normalizedProvider];
 
     if (!modulePath) {
@@ -1080,8 +1086,6 @@ ipcMain.handle("load-provider-module", async (event, provider) => {
       throw new Error("Failed to load module: " + modulePath);
     }
 
-    //console.log("Loaded module:", module); // Ajout de log
-
     const availableMethods = [
       "startSession",
       "handleSpin",
@@ -1093,8 +1097,6 @@ ipcMain.handle("load-provider-module", async (event, provider) => {
       (method) =>
         module.default[method] && typeof module.default[method] === "function"
     );
-
-    //console.log("Available methods:", availableMethods); // Ajout de log
 
     const resultModule = {};
     availableMethods.forEach((method) => {
