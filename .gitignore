@@ -10,7 +10,6 @@ public/
 *.json
 *.lock
 *.md
-*.yaml
 *.toml
 *.ini
 *.cfg
