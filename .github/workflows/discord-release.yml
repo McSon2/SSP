@@ -1,38 +1,32 @@
-name: Discord Notification
+name: Discord Release Notification
 
 on:
   release:
     types: [published]
-  push:
-    branches: [main]
-  workflow_dispatch:
+  workflow_dispatch: # Gardé pour permettre les tests manuels
 
 jobs:
   notify_discord:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
       - name: Send Discord Notification
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
-          if [ "${{ github.event_name }}" == "release" ]; then
-            TITLE="New Release: ${{ github.event.release.name }}"
-            DESCRIPTION="${{ github.event.release.body }}"
-            URL="${{ github.event.release.html_url }}"
-          else
-            TITLE="New Push to ${{ github.ref_name }}"
-            DESCRIPTION="A new commit has been pushed."
-            URL="${{ github.event.repository.html_url }}"
-          fi
+          TITLE="New Release: ${{ github.event.release.name }}"
+          DESCRIPTION=$(echo "${{ github.event.release.body }}" | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+          URL="${{ github.event.release.html_url }}"
 
-          curl -H "Content-Type: application/json" -X POST -d '{
+          JSON_PAYLOAD=$(cat <<EOF
+          {
             "embeds": [{
-              "title": "'"$TITLE"'",
-              "description": "'"$DESCRIPTION"'",
-              "url": "'"$URL"'",
+              "title": "${TITLE}",
+              "description": "${DESCRIPTION}",
+              "url": "${URL}",
               "color": 3066993
             }]
-          }' $DISCORD_WEBHOOK
+          }
+          EOF
+          )
+
+          curl -H "Content-Type: application/json" -X POST -d "${JSON_PAYLOAD}" $DISCORD_WEBHOOK
