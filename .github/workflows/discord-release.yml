@@ -15,15 +15,15 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
-          RELEASE_NAME=$(jq -r .release.name $GITHUB_EVENT_PATH)
-          RELEASE_BODY=$(jq -r .release.body $GITHUB_EVENT_PATH)
-          RELEASE_URL=$(jq -r .release.html_url $GITHUB_EVENT_PATH)
+          RELEASE_NAME="${{ github.event.release.name }}"
+          RELEASE_BODY="${{ github.event.release.body }}"
+          RELEASE_URL="${{ github.event.release.html_url }}"
 
           curl -H "Content-Type: application/json" -X POST -d '{
             "embeds": [{
-              "title": "New Release: '"$RELEASE_NAME"'",
-              "description": "'"${RELEASE_BODY//$'\n'/\\n}"'",
-              "url": "'"$RELEASE_URL"'",
+              "title": "New Release: '"${RELEASE_NAME}"'",
+              "description": "'"${RELEASE_BODY}"'",
+              "url": "'"${RELEASE_URL}"'",
               "color": 3066993
             }]
           }' $DISCORD_WEBHOOK
