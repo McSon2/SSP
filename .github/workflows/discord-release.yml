@@ -1,38 +1,38 @@
 name: Discord Notification
 
-   on:
-     release:
-       types: [published]
-     push:
-       branches: [main]  # Ajoutez ceci pour tester
-     workflow_dispatch:  # Permet le déclenchement manuel
+on:
+  release:
+    types: [published]
+  push:
+    branches: [main]
+  workflow_dispatch:
 
-   jobs:
-     notify_discord:
-       runs-on: ubuntu-latest
-       steps:
-         - name: Checkout code
-           uses: actions/checkout@v2
+jobs:
+  notify_discord:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-         - name: Send Discord Notification
-           env:
-             DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-           run: |
-             if [ "${{ github.event_name }}" == "release" ]; then
-               TITLE="New Release: ${{ github.event.release.name }}"
-               DESCRIPTION="${{ github.event.release.body }}"
-               URL="${{ github.event.release.html_url }}"
-             else
-               TITLE="New Push to ${{ github.ref_name }}"
-               DESCRIPTION="A new commit has been pushed."
-               URL="${{ github.event.repository.html_url }}"
-             fi
-             
-             curl -H "Content-Type: application/json" -X POST -d '{
-               "embeds": [{
-                 "title": "'"$TITLE"'",
-                 "description": "'"$DESCRIPTION"'",
-                 "url": "'"$URL"'",
-                 "color": 3066993
-               }]
-             }' $DISCORD_WEBHOOK
+      - name: Send Discord Notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          if [ "${{ github.event_name }}" == "release" ]; then
+            TITLE="New Release: ${{ github.event.release.name }}"
+            DESCRIPTION="${{ github.event.release.body }}"
+            URL="${{ github.event.release.html_url }}"
+          else
+            TITLE="New Push to ${{ github.ref_name }}"
+            DESCRIPTION="A new commit has been pushed."
+            URL="${{ github.event.repository.html_url }}"
+          fi
+
+          curl -H "Content-Type: application/json" -X POST -d '{
+            "embeds": [{
+              "title": "'"$TITLE"'",
+              "description": "'"$DESCRIPTION"'",
+              "url": "'"$URL"'",
+              "color": 3066993
+            }]
+          }' $DISCORD_WEBHOOK
