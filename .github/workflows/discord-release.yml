@@ -3,7 +3,7 @@ name: Discord Release Notification
 on:
   release:
     types: [published]
-  workflow_dispatch: # Gardé pour permettre les tests manuels
+  workflow_dispatch:
 
 jobs:
   notify_discord:
@@ -13,7 +13,7 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
-          TITLE="New Release: ${{ github.event.release.name }}"
+          TITLE=$(echo "${{ github.event.release.name }}" | sed 's/"/\\"/g')
           DESCRIPTION=$(echo "${{ github.event.release.body }}" | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
           URL="${{ github.event.release.html_url }}"
 
@@ -29,4 +29,22 @@ jobs:
           EOF
           )
 
-          curl -H "Content-Type: application/json" -X POST -d "${JSON_PAYLOAD}" $DISCORD_WEBHOOK
+          # Validate JSON
+          echo $JSON_PAYLOAD | jq . > /dev/null 2>&1
+          if [ $? -ne 0 ]; then
+            echo "Invalid JSON payload. Exiting."
+            exit 1
+          fi
+
+          # Send notification
+          RESPONSE=$(curl -s -w "\n%{http_code}" -H "Content-Type: application/json" -X POST -d "${JSON_PAYLOAD}" $DISCORD_WEBHOOK)
+          HTTP_STATUS=$(echo "$RESPONSE" | tail -n 1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+
+          if [ $HTTP_STATUS -ne 204 ]; then
+            echo "Error sending Discord notification. Status code: $HTTP_STATUS"
+            echo "Response body: $BODY"
+            exit 1
+          else
+            echo "Discord notification sent successfully."
+          fi
