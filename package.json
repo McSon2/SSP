@@ -1,7 +1,7 @@
 {
   "name": "ssp",
   "private": true,
-  "version": "0.2.1",
+  "version": "0.2.0",
   "type": "module",
   "main": "public/main.cjs",
   "scripts": {
@@ -49,7 +49,8 @@
       {
         "provider": "github",
         "owner": "McSon2",
-        "repo": "SSP"
+        "repo": "SSP",
+        "releaseType": "release"
       }
     ]
   },
