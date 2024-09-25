@@ -77,7 +77,7 @@
 
 ## 🛠️ Installation
 
-1. **Téléchargement** : Récupérez le fichier `.exe` de la dernière version de SSPilot depuis notre [page de releases GitHub](https://github.com/votre-nom-utilisateur/sspilot/releases/latest).
+1. **Téléchargement** : Récupérez le fichier `.exe` de la dernière version de SSPilot depuis notre [page de releases GitHub](https://github.com/McSon2/SSP/releases/latest).
 2. **Installation** : Lancez le fichier `.exe` téléchargé et suivez les instructions à l'écran.
 
 > **Note** : Assurez-vous de toujours utiliser la dernière version pour profiter des fonctionnalités les plus récentes et des correctifs.
@@ -103,15 +103,13 @@
 
 ## 🆙 Mises à Jour
 
-SSPilot est régulièrement enrichi de nouvelles fonctionnalités et optimisations. Consultez notre [changelog](#) pour découvrir les dernières mises à jour.
+SSPilot est régulièrement enrichi de nouvelles fonctionnalités et optimisations. Consultez notre [changelog](https://github.com/McSon2/SSP/releases/latest) pour découvrir les dernières mises à jour.
 
 ## 🤝 Support
 
 Pour toute assistance ou question :
 
 - **Discord** : Rejoignez notre [serveur communautaire](https://discord.gg/fKQJw8Bcaz) pour échanger avec d'autres utilisateurs et l'équipe de développement.
-- **FAQ** : Consultez notre [FAQ](#) pour obtenir des réponses aux questions fréquentes.
-- **Email** : Contactez-nous à l'adresse [support@sspilot.cc](mailto:support@sspilot.cc).
 
 ## 📜 Licence
 
