@@ -79,6 +79,7 @@ SSPilot est une application innovante conçue pour optimiser et accélérer votr
 11. **Massive Studios**
 12. **Endorphina**
 13. **Relax Gaming**
+14. **Thunderkick**
 
 ### 🎲 Original Games
 
