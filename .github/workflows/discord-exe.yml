@@ -24,7 +24,7 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_EXE_WEBHOOK }}
         with:
           args: |
-            Nouvelle version disponible ! @everyone
+            Nouvelle version disponible !
             **Nom de la release:** ${{ github.event.release.name }}
             **Lien de téléchargement de l'exécutable:** ${{ steps.get_exe_url.outputs.EXE_URL }}
 
