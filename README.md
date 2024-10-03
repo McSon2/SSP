@@ -88,6 +88,7 @@ SSPilot est une application innovante conçue pour optimiser et accélérer votr
 
 - **Dice**
 - **Limbo**
+- **Mines**
 
 ### 🛠️ Installation
 
