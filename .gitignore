@@ -22,3 +22,4 @@ save/
 *.ts
 package.json
 obfuscate-main.mjs
+.gitignore__private
