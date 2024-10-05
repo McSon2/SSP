@@ -6,6 +6,7 @@ src/
 release/
 build/
 public/
+save/
 *.cjs
 *.txt
 *.json
