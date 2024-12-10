@@ -19,7 +19,7 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         with:
           args: |
-            A new release has been published! @everyone
+            A new release has been published!
             **Name:** ${{ github.event.release.name }}
             **URL:** ${{ github.event.release.html_url }}
 
