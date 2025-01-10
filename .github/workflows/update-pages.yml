@@ -1,0 +1,40 @@
+name: Update GitHub Pages Redirection
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  update-redirect:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Get latest release asset URL
+        id: get_url
+        run: |
+          LATEST_URL=$(curl -s https://api.github.com/repos/McSon2/SSP/releases/latest | grep browser_download_url | grep .exe | head -n 1 | cut -d '"' -f 4)
+          echo "LATEST_URL=$LATEST_URL" >> $GITHUB_ENV
+
+      - name: Update index.html
+        run: |
+          echo "<!DOCTYPE html>
+          <html>
+          <head>
+            <meta http-equiv=\"refresh\" content=\"0; url=${LATEST_URL}\" />
+            <title>Redirection...</title>
+          </head>
+          <body>
+            <p>Redirection en cours vers le téléchargement de la dernière version...</p>
+          </body>
+          </html>" > index.html
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Mise à jour de la redirection vers la dernière release"
+          git push origin gh-pages
