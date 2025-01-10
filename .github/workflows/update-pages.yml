@@ -3,7 +3,7 @@ name: Update GitHub Pages Redirection
 on:
   release:
     types: [published]
-  workflow_dispatch:  # Déclencheur manuel ajouté
+  workflow_dispatch:  # Permet le déclenchement manuel
 
 jobs:
   update-redirect:
@@ -12,9 +12,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-        with:
-          ref: gh-pages  # Spécifie la branche gh-pages
-          fetch-depth: 0  # Assure que tout l'historique est récupéré
 
       - name: Get latest release asset URL
         id: get_url
@@ -22,8 +19,9 @@ jobs:
           LATEST_URL=$(curl -s https://api.github.com/repos/McSon2/SSP/releases/latest | grep browser_download_url | grep .exe | head -n 1 | cut -d '"' -f 4)
           echo "LATEST_URL=$LATEST_URL" >> $GITHUB_ENV
 
-      - name: Update index.html
+      - name: Generate index.html
         run: |
+          mkdir -p deploy
           echo "<!DOCTYPE html>
           <html>
           <head>
@@ -33,12 +31,20 @@ jobs:
           <body>
             <p>Redirection en cours vers le téléchargement de la dernière version...</p>
           </body>
-          </html>" > index.html
+          </html>" > deploy/index.html
 
-      - name: Commit and push changes
+      - name: Verify index.html
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add index.html
-          git commit -m "Mise à jour de la redirection vers la dernière release" || echo "No changes to commit"
-          git push origin gh-pages
+          echo "Contenu de deploy/index.html :"
+          cat deploy/index.html
+          echo "Liste des fichiers dans deploy :"
+          ls -la deploy
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy  # Pointage vers le répertoire dédié
+          publish_branch: gh-pages
+          allow_empty_commit: true
+          commit_message: "Mise à jour de la redirection vers la dernière release"
