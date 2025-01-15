@@ -3,7 +3,7 @@ name: Update GitHub Pages Redirection
 on:
   release:
     types: [published]
-  workflow_dispatch:  # Permet le déclenchement manuel
+  workflow_dispatch:
 
 jobs:
   update-redirect:
@@ -13,38 +13,62 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Get latest release asset URL
-        id: get_url
+      - name: Get latest release asset URLs
+        id: get_urls
         run: |
-          LATEST_URL=$(curl -s https://api.github.com/repos/McSon2/SSP/releases/latest | grep browser_download_url | grep .exe | head -n 1 | cut -d '"' -f 4)
-          echo "LATEST_URL=$LATEST_URL" >> $GITHUB_ENV
+          RESPONSE=$(curl -s https://api.github.com/repos/McSon2/SSP/releases/latest)
+          WINDOWS_URL=$(echo "$RESPONSE" | grep browser_download_url | grep .exe | head -n 1 | cut -d '"' -f 4)
+          MAC_URL=$(echo "$RESPONSE" | grep browser_download_url | grep .dmg | head -n 1 | cut -d '"' -f 4)
+          echo "WINDOWS_URL=$WINDOWS_URL" >> $GITHUB_ENV
+          echo "MAC_URL=$MAC_URL" >> $GITHUB_ENV
 
-      - name: Generate index.html
+      - name: Generate HTML files
         run: |
           mkdir -p deploy
-          echo "<!DOCTYPE html>
+          
+          # Création du fichier Windows
+          cat > deploy/windows.html << EOF
+          <!DOCTYPE html>
           <html>
           <head>
-            <meta http-equiv=\"refresh\" content=\"0; url=${LATEST_URL}\" />
-            <title>Redirection...</title>
+            <meta http-equiv="refresh" content="0; url=${WINDOWS_URL}" />
+            <title>Redirection Windows</title>
           </head>
           <body>
-            <p>Redirection en cours vers le téléchargement de la dernière version...</p>
+            <p>Redirection en cours vers le téléchargement de la version Windows...</p>
           </body>
-          </html>" > deploy/index.html
+          </html>
+          EOF
+          
+          # Création du fichier Mac
+          cat > deploy/mac.html << EOF
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta http-equiv="refresh" content="0; url=${MAC_URL}" />
+            <title>Redirection Mac</title>
+          </head>
+          <body>
+            <p>Redirection en cours vers le téléchargement de la version Mac...</p>
+          </body>
+          </html>
+          EOF
 
-      - name: Verify index.html
+      - name: Verify files
         run: |
-          echo "Contenu de deploy/index.html :"
-          cat deploy/index.html
-          echo "Liste des fichiers dans deploy :"
-          ls -la deploy
+          echo "Contenu des fichiers :"
+          echo "Windows :"
+          cat deploy/windows.html
+          echo "Mac :"
+          cat deploy/mac.html
+          echo "Structure des dossiers :"
+          ls -R deploy
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./deploy  # Pointage vers le répertoire dédié
+          publish_dir: ./deploy
           publish_branch: gh-pages
           allow_empty_commit: true
-          commit_message: "Mise à jour de la redirection vers la dernière release"
+          commit_message: "Mise à jour des redirections vers la dernière release"
