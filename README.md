@@ -58,29 +58,64 @@
 
 ### 🎯 Stake Original Games (20)
 
-```
-🐲 Dragon Tower        🎲 Dice               🏀 Plinko            🎯 Darts
-👺 Blue Samurai        🚀 Limbo              🃏 Flip              📦 Cases  
-🎱 Keno                ⛏️ Mines              ✂️ Rock Paper Scissors  🎡 Wheel
-⛽ Pump                📈 Hilo               🪲 Scarab Spin        🍺 Bars
-💎 Diamonds            📚 Tome of Life       🐍 Snakes             🐔 Chicken
-```
+- Dragon Tower
+- Blue Samurai
+- Keno
+- Pump
+- Diamonds
+- Dice
+- Limbo
+- Mines
+- Hilo
+- Tome of Life
+- Plinko
+- Flip
+- Rock Paper Scissors
+- Scarab Spin
+- Snakes
+- Darts
+- Cases
+- Wheel
+- Bars
+- Chicken
 
 ### 🏢 Third-Party Providers (35)
 
-#### 🔥 Providers
-```
-Hacksaw Gaming      Push Gaming         Print Studios       NoLimit City
-Backseat Gaming     Massive Studios     Thunderkick         Peter & Sons  
-Bullshark Games     Endorphina         TrueLab             Shady Lady
-Pragmatic Play      Relax Gaming       OneTouch            Jade Rabbit
-Twist Gaming        BGaming            AvatarUX            Just Slots
-Titan Gaming        Popiplay           Hacksaw OpenRGS
-Octoplay            Fat Panda              Paperclip Gaming        Madlab Gaming
-Stake Engine           Paradice Gaming         Drip Drop Studios
-Rubber Duck Gaming     Mirror Image Gaming     18 Gaming
-Atomic Gaming          Red Tiger
-```
+- Hacksaw Gaming
+- Backseat Gaming
+- Bullshark Games
+- Pragmatic Play
+- Twist Gaming
+- Titan Gaming
+- Popiplay
+- Octoplay
+- BGaming
+- Push Gaming
+- Massive Studios
+- Endorphina
+- Relax Gaming
+- Print Studios
+- Thunderkick
+- TrueLab
+- OneTouch
+- AvatarUX
+- NoLimit City
+- Peter & Sons
+- Shady Lady
+- Jade Rabbit
+- Just Slots
+- Hacksaw OpenRGS
+- Fat Panda
+- Stake Engine
+- Paperclip Gaming
+- Paradice Gaming
+- Rubber Duck Gaming
+- Mirror Image Gaming
+- Madlab Gaming
+- Drip Drop Studios
+- 18 Gaming
+- Atomic Gaming
+- Red Tiger
 
 ---
 
