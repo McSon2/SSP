@@ -18,12 +18,12 @@ jobs:
         run: |
           RESPONSE=$(curl -s https://api.github.com/repos/McSon2/SSP/releases/latest)
           URLS=$(echo "$RESPONSE" | grep browser_download_url | cut -d '"' -f 4)
-          # SSPilot (Tauri) d'abord : sa release porte aussi les fichiers de mise à
-          # jour de SSP (Electron), pour que les anciennes versions reçoivent la
-          # dernière. Repli sur l'installeur d'Electron (anciennes releases).
-          WINDOWS_URL=$(echo "$URLS" | grep -E '/SSPilot_[^/]*_x64-setup\.exe$' | head -n 1)
+          # Version Tauri d'abord (SSP_<version>_…) : sa release porte aussi les
+          # fichiers de mise à jour d'Electron (SSP-<version>…), pour que les anciennes
+          # versions reçoivent la dernière. Repli sur Electron (anciennes releases).
+          WINDOWS_URL=$(echo "$URLS" | grep -E '/SSP_[^/]*_x64-setup\.exe$' | head -n 1)
           [ -z "$WINDOWS_URL" ] && WINDOWS_URL=$(echo "$URLS" | grep -E '\.exe$' | head -n 1)
-          MAC_URL=$(echo "$URLS" | grep -E '/SSPilot_[^/]*\.dmg$' | head -n 1)
+          MAC_URL=$(echo "$URLS" | grep -E '/SSP_[^/]*\.dmg$' | head -n 1)
           [ -z "$MAC_URL" ] && MAC_URL=$(echo "$URLS" | grep -E '\.dmg$' | head -n 1)
           if [ -z "$WINDOWS_URL" ] || [ -z "$MAC_URL" ]; then
             echo "::error::Installeur introuvable dans la dernière release."
